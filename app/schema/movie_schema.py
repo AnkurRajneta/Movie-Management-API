@@ -3,6 +3,7 @@ from pydantic import BaseModel
 class movie_schema(BaseModel):
     name :str
     actors:int
+    
 
     class Config:
         orm_mode = True

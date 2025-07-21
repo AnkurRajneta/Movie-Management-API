@@ -5,7 +5,7 @@ from app.config.config import Database
 
 
 
-engine = create_engine(Database,connect_args={"check_same_thread" : False})
+engine = create_engine(Database,connect_args={"check_same_thread" : False}if Database.startswith("sqlite") else {})
 
 
 
