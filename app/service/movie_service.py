@@ -5,6 +5,7 @@ from app.schema.movie_schema import movie_schema
 class movie_service:
     def __init__(self, db: Session):
         self.repo = movies_repository(db)
+        self.db = db
 
     def get_all_movies(self):
         return self.repo.get_all_movies()

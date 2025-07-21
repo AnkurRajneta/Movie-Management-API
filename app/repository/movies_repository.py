@@ -1,4 +1,3 @@
-from re import S
 from sqlalchemy.orm import Session
 from app.models.movie_model import movie_model
 from app.schema.movie_schema import movie_schema
