@@ -11,7 +11,7 @@ load_dotenv()
 
 from app.config.config import Database
 from app.config.database import Base
-from app.models import movie_model  
+from app.models import *
 
 config = context.config
 
