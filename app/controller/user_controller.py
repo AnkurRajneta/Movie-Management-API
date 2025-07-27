@@ -22,7 +22,7 @@ def get_user(user_id:int, db: Session = Depends(get_db)):
     service = User_Service(db)
     return service.getting_user(user_id)
 
-@router.get("/all/", response_model=List[UserOut])
+@router.get("/all/", response_model=List[user_create])
 def getting_all(db:Session = Depends(get_db)):
     service = User_Service(db)
     return service.getting_all()

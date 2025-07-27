@@ -29,7 +29,7 @@ class User_Repository:
         return self.db.query(UserModel).filter(email == UserModel.email).first()
     
 
-    def create(self,structure:user_create) -> UserOut:
+    def create(self,structure:user_create, ) -> UserOut:
         user = UserModel(username= structure.username, email = structure.email, password = structure.password)
         self.db.add(user)
         self.db.commit()
