@@ -1,28 +1,16 @@
-
-import re
-from sqlalchemy import all_
-from sqlalchemy.orm import Session
-from app.models.user_model import UserModel
 from app.repository.user_repository import User_Repository
-from app.schema.auth_schema import AuthSchema, RegisterSchema, RegisterOut
-
+from app.schema.auth_schema import RegisterSchema, RegisterOut
 
 class Auth_Services:
-    def __init__(self, db: Session):
+    def __init__(self, db):
         self.repo = User_Repository(db)
     
     def auth_service(self, username, password):
-        all_user = self.repo.get_all_user()
-        for user in all_user:
-            if user.username ==username:
-                if user.password == password:
-                    return user
+        user = self.repo.get_by_username(username)
+        if user and user.password == password:  # Hash+check in prod
+            return user
+        return None
 
-        return None      
-
-    def register_auth(self, payload:RegisterSchema):
+    def register_auth(self, payload: RegisterSchema):
         new_user = self.repo.create(payload)
         return RegisterOut.model_validate(new_user)
-
-        
-        

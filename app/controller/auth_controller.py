@@ -1,34 +1,29 @@
-from fastapi import FastAPI, HTTPException, status, Depends
-from typing import Annotated
-from datetime import datetime, timedelta
-
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from app.controller.movie_controller import *
-from app.controller.user_controller import create_user, get_user, getting_all
-from app.controller.auth_controller import *
-from app.models.user_model import UserModel
-from app.schema.auth_schema import AuthSchema, RegisterSchema
-from app.service import auth_service
+from fastapi import APIRouter, HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from app.schema.auth_schema import AuthSchema, RegisterSchema, RegisterOut
 from app.service.auth_service import Auth_Services
+from app.dependencies.auth import get_current_user
+from app.config.database import get_db
+from app.core.jwt import create_jwt
+from fastapi.security import HTTPBearer
 
 router = APIRouter()
-
-
+security = HTTPBearer()  # Declare security scheme for Swagger UI
 
 @router.post('/login')
-def login(payload:AuthSchema, db:Session = Depends(get_db)):
-    service  = Auth_Services(db)
-    user = service.auth_service(payload.username, payload.password)
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incorrect details")
-    
-    return {"messsage": "Logged in successfully"}
-
-@router.post('/Register')
-def register(payload:RegisterSchema, db:Session = Depends(get_db)):
+def login(payload: AuthSchema, db: Session = Depends(get_db)):
     service = Auth_Services(db)
-    register_user = service.register_auth(payload)
+    user = service.auth_service(payload.username, payload.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Incorrect details")
+    token = create_jwt({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
 
+@router.post('/register', response_model=RegisterOut)
+def register(payload: RegisterSchema, db: Session = Depends(get_db)):
+    service = Auth_Services(db)
+    return service.register_auth(payload)
 
-    
+@router.get('/me', dependencies=[Depends(security)])
+def me(current_user = Depends(get_current_user)):
+    return current_user
