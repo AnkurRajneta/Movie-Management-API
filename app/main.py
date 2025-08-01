@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI
 from fastapi.openapi.utils import get_openapi
-
+from jose import JWTError, jwt 
 from app.controller.movie_controller import router as movie_router
 from app.controller.user_controller import router as user_router
 from app.controller.auth_controller import router as auth_router
@@ -10,12 +10,12 @@ from app.config.database import engine
 
 movie_model.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Movie Management API", version="1.0.0")
+app = FastAPI(title="Movie Management API")
 
 # Register routers
-app.include_router(movie_router, prefix="/movies", tags=["Movies"], dependencies=[Depends(get_current_user)])
-app.include_router(user_router, prefix="/user", tags=["User"])
-app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(movie_router, prefix="/api/v1/movies", tags=["Movies"], dependencies=[Depends(get_current_user)])
+app.include_router(user_router, prefix="/api/v1/user", tags=["User"], dependencies=[Depends(get_current_user)])
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 
 @app.get("/")
 def root():

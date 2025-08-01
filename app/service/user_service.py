@@ -17,7 +17,7 @@ class User_Service:
         return new_user
     
     def getting_user(self, user_id:int):
-        user =  self.repo.get_user(user_id)
+        user =  self.repo.get_user_id(user_id)
         print(user.id)
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "User not found")
@@ -26,8 +26,8 @@ class User_Service:
     def getting_all(self):
         return self.repo.get_all_user()
     
-    def getting_email(self, email:str):
-        return self.repo.get_by_email(email)
+    # def getting_email(self, email:str):
+    #     return self.repo.get_by_email(email)
     
     def update_user(self, user_id:int, structure:user_update):
         return self.repo.update(user_id, structure)

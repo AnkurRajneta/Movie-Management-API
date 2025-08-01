@@ -8,7 +8,7 @@ from app.core.jwt import create_jwt
 from fastapi.security import HTTPBearer
 
 router = APIRouter()
-security = HTTPBearer()  # Declare security scheme for Swagger UI
+security = HTTPBearer()  
 
 @router.post('/login')
 def login(payload: AuthSchema, db: Session = Depends(get_db)):

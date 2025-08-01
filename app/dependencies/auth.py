@@ -1,27 +1,31 @@
-from fastapi import Header, HTTPException, status, Depends
+from fastapi import Header, HTTPException, status, Depends, Request
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.repository.user_repository import User_Repository
 from app.core.jwt import decode_jwt
 
 def get_current_user(
-    authorization: str = Header(None),
-    db: Session = Depends(get_db),
+    request:Request,
+    db: Session = Depends(get_db)
 ):
-    print(f"Authorization header received: {authorization}")
+    authorization = request.headers.get('Authorization')
+
     if not authorization or not authorization.lower().startswith("bearer "):
-        print("Invalid or missing Authorization header")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing or invalid Authorization header"
         )
+
     token = authorization[7:].strip()
-    print(f"Extracted token: {token}")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Empty token in Authorization header"
+        )
+
     try:
         payload = decode_jwt(token)
-        print(f"Decoded JWT payload: {payload}")
     except Exception as e:
-        print(f"JWT decode error: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid or expired token: {str(e)}"
@@ -29,18 +33,23 @@ def get_current_user(
 
     username = payload.get("sub")
     if not username:
-        print("JWT token has no subject claim")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token missing subject claim"
+            detail="Token missing subject (sub) claim"
         )
-    user = User_Repository(db).get_by_username(username)
+
+    try:
+        user = User_Repository(db).get_by_username(username)
+    except Exception as db_exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error while accessing user data"
+        )
+
     if not user:
-        print(f"User not found in database: {username}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    print(f"Authenticated user: {username}")
-    return user
 
+    return user

@@ -11,19 +11,19 @@ from app.schema.movie_schema import movie_schema, movie_schema_2
 
 router = APIRouter()
 
-@router.get('/Movies/Collections/1.1', response_model=List[movie_schema_2])
+@router.get('', response_model=List[movie_schema_2])
 def get_movies(db: Session = Depends(get_db)):
     service = movie_service(db)
     return service.get_all_movies()
 
 
-@router.post('/Movies/Collections/1.2', response_model=movie_schema_2)
+@router.post('', response_model=movie_schema_2)
 def create_movies(movie: movie_schema, db: Session = Depends(get_db)):
     service = movie_service(db)
     return service.adding_movie(movie)
 
 
-@router.put('/Movies/Collections/1.3/{movieid}', response_model=movie_schema_2)
+@router.put('/{movieid}', response_model=movie_schema_2)
 def update_controller(movieid: int, movie: movie_schema, db: Session = Depends(get_db)):
     service = movie_service(db)
     updated = service.updating_movie_list(movieid, movie)
@@ -32,7 +32,7 @@ def update_controller(movieid: int, movie: movie_schema, db: Session = Depends(g
     return updated
 
 
-@router.delete("/Movies/1.4/{movieid}")
+@router.delete("/{movieid}")
 def delete_movie(movieid: int, db: Session = Depends(get_db)):
     service = movie_service(db)
     success = service.deleting_movie(movieid)

@@ -15,25 +15,25 @@ from fastapi import APIRouter, Depends
 
 router = APIRouter()
 
-
+    
 
 @router.get("/{user_id}", response_model=UserOut)
 def get_user(user_id:int, db: Session = Depends(get_db)):
     service = User_Service(db)
     return service.getting_user(user_id)
 
-@router.get("/all/", response_model=List[user_create])
+@router.get("", response_model=List[UserOut])
 def getting_all(db:Session = Depends(get_db)):
     service = User_Service(db)
     return service.getting_all()
 
-@router.get('/by-email/{email}', response_model=UserOut) 
-def get_userby_email(email: EmailStr, db: Session = Depends(get_db)):
-    service = User_Service(db)
-    return service.getting_email(email)
+# @router.get('/email/{email}', response_model=UserOut) 
+# def get_by_email(email: EmailStr, db: Session = Depends(get_db)):
+#     service = User_Service(db)
+#     return service.getting_email(email)
 
 
-@router.post('/', response_model=UserOut)
+@router.post('', response_model=UserOut)
 def create_user(structure:user_create, db:Session = Depends(get_db)):
     service = User_Service(db)
     return service.create_user(structure)   
