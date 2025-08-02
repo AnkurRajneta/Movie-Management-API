@@ -8,7 +8,10 @@ from app.dependencies.auth import get_current_user
 from app.models import movie_model
 from app.config.database import engine
 
-movie_model.Base.metadata.create_all(bind=engine)
+async def create_all_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(movie_model.Base.metadata.create_all)
+
 
 app = FastAPI(title="Movie Management API")
 
