@@ -3,6 +3,8 @@ from sqlalchemy import  select
 # from sqlalchemy.orm import Session
 from app.models.movie_model import MovieModel
 from app.schema.movie_schema import movie_schema
+from sqlalchemy import update as sqlalchemy_update
+from sqlalchemy import delete as sqlalchemy_delete
 
 class movies_repository:
     def __init__(self,db:AsyncSession):
@@ -21,27 +23,25 @@ class movies_repository:
         return new_movie
     
     async def update(self, movieid:int,movie:movie_schema):
-        db_movie = select(MovieModel).where(MovieModel.id == movieid)
-        result = await self.db.execute(db_movie)
-        db_movie = result.scalars().first()
-
-        if not db_movie:
-            None
-
-        db_movie.name = movie.name
-        db_movie.actors = movie.actors
+        update_movies = (
+            sqlalchemy_update(MovieModel)
+            .where(MovieModel.id == movieid)
+            .values(**movie.model_dump())
+        )
+        # db_movie = select(MovieModel).where(MovieModel.id == movieid)
+        
+        await self.db.execute(update_movies)
         await self.db.commit()
-        await self.db.refresh(db_movie)
-        return db_movie
+        updated_values = await self.db.get(MovieModel, movieid)
+        return updated_values
     
 
     async def delete(self, movieid:int):
-        db_movie = select(MovieModel).where(MovieModel.id == movieid)
-        result = await self.db.execute(db_movie)
-        db_movie = result.scalars().first()
-        if not db_movie:
-            return {"message": "unable to find what to delete"}
         
-        await self.db.delete(db_movie)
+        deleted_movies =( sqlalchemy_delete(MovieModel)
+        .where(MovieModel.id == movieid))
+        
+       
+        await self.db.execute(deleted_movies)
         await self.db.commit()
         return True
