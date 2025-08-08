@@ -9,8 +9,8 @@ class movie_service:
         self.repo = movies_repository(db)
         self.db = db
 
-    async def get_all_movies(self):
-        return await self.repo.get_all_movies()
+    async def get_all_movies(self, skip : int = 1, limit: int = 2):
+        return await self.repo.get_all_movies(skip = skip, limit = limit)
     
     async def adding_movie(self, movie: movie_schema):
         return await self.repo.create(movie)

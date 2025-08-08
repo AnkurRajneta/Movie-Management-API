@@ -1,5 +1,5 @@
 from fastapi.templating import Jinja2Templates
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from app.config.database import get_db
@@ -12,9 +12,9 @@ from app.schema.movie_schema import movie_schema, movie_schema_2
 router = APIRouter()
 
 @router.get('', response_model=List[movie_schema_2])
-async def get_movies(db: AsyncSession = Depends(get_db)):
+async def get_movies(skip :int = Query(1, ge=0), limit : int = Query(2, le = 20),db: AsyncSession = Depends(get_db)):
     service = movie_service(db)
-    return await service.get_all_movies()
+    return await service.get_all_movies(skip = skip, limit = limit)
 
 
 @router.post('', response_model=movie_schema_2)

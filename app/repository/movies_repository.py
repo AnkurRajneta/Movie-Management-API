@@ -10,8 +10,10 @@ class movies_repository:
     def __init__(self,db:AsyncSession):
         self.db = db
 
-    async def get_all_movies(self):
-         movies = select(MovieModel)
+    async def get_all_movies(self, skip: int = 1, limit : int = 2):
+         movies =( select(MovieModel).offset(skip).limit(limit)
+         .order_by(MovieModel.id)
+         )
          result = await self.db.execute(movies)
          return result.scalars().all()
     
