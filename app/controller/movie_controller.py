@@ -28,7 +28,7 @@ def background_insert(movie_data):
             await service.insert_movies(movie_data)
         loop.run_until_complete(_insert_movie_async)
         loop.close()
-
+ 
 @router.post("/insert")
 async def insert_movies(movie:movie_schema, db:AsyncSession = Depends(get_db)):
     service = movie_service(db)
