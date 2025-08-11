@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from fastapi.templating import Jinja2Templates
 from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,17 @@ from app.schema.movie_schema import movie_schema, movie_schema_2
 # templates = Jinja2Templates(directory="app/templates")
 
 router = APIRouter()
+
+executor = ThreadPoolExecutor(max_)
+
+
+
+
+
+@router.post("/insert", response_model=movie_schema_2)
+async def insert_movies(movie:movie_schema, db:AsyncSession = Depends(get_db)):
+    service = movie_service(db)
+    return await service.insert_movies(movie)
 
 @router.get('', response_model=List[movie_schema_2])
 async def get_movies(skip :int = Query(1, ge=0), limit : int = Query(2, le = 20),db: AsyncSession = Depends(get_db)):
