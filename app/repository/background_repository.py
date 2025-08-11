@@ -13,4 +13,8 @@ class BackgroundRepository:
         self.movie = movies_repository(db)
 
     async def create_background_data(self, payload:movie_schema):
-          return await self.movie.create(payload)
+          inserted_movie =  await self.movie.create(payload)
+          self.db.add(inserted_movie)
+          await self.db.commit()
+          await self.db.refresh(inserted_movie)
+          return inserted_movie
